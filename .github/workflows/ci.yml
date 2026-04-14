@@ -1,0 +1,31 @@
+name: DevOps CI Pipeline
+on: [push]
+jobs:
+    test-and-build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Start DB and API
+              run: |
+                  docker-compose up --build -d
+                  sleep 15  # Wait for health checks
+
+            - name: Test API Response
+              run: |
+                  response=$(curl -s http://localhost:8000)
+                  if [[ $response != *'"user":"Alice"'* ]]; then
+                    echo "❌ API test failed: $response"
+                    exit 1
+                  fi
+                  echo "✅ API returned expected user"
+
+            - name: Verify Containers Healthy
+              run: |
+                  api_status=$(docker inspect devops-lab-api-1 --format='{{.State.Health.Status}}')
+                  db_status=$(docker inspect devops-lab-db-1 --format='{{.State.Health.Status}}')
+                  if [[ "$api_status" != "healthy" || "$db_status" != "healthy" ]]; then
+                    echo "❌ Health check failed - API: $api_status, DB: $db_status"
+                    exit 1
+                  fi
+                  echo "✅ All services healthy"
