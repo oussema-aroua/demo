@@ -14,7 +14,7 @@ jobs:
             - name: Test API Response
               run: |
                   response=$(curl -s http://localhost:8000)
-                  if [[ $response != *'"user":"Alice"'* ]]; then
+                  if [[ $response != *'"user":"Alice"'* ]]; then #
                     echo "❌ API test failed: $response"
                     exit 1
                   fi
