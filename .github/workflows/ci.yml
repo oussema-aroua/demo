@@ -38,7 +38,7 @@ jobs:
                   echo "✅ All services healthy"
 
             - name: Set up Snyk
-              uses: snyk/actions/setup@v2
+              uses: snyk/actions/setup@master
               with:
                   version: latest
 
