@@ -37,6 +37,12 @@ jobs:
                   fi
                   echo "✅ All services healthy"
 
+            - name: Set up Snyk
+              uses: snyk/actions/setup@v2
+              with:
+                  version: latest
+
             - name: Scan Docker Image for Vulnerabilities
               run: |
-                  docker scan my-api --accept-license --group-issues
+                  docker build -t my-api .
+                  snyk container test my-api --file=Dockerfile
