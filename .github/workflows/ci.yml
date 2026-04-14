@@ -25,3 +25,7 @@ jobs:
                     exit 1
                   fi
                   echo "✅ All services healthy"
+
+            - name: Scan Docker Image for Vulnerabilities
+              run: |
+                  docker scan my-api --accept-license --group-issues
