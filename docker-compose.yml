@@ -1,0 +1,30 @@
+services:
+    api:
+        build: .
+        ports:
+            - "8000:8000"
+        depends_on:
+            db:
+                condition: service_healthy # Wait for DB to be ready
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:8000"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_DB: myapp
+            POSTGRES_USER: dev
+            POSTGRES_PASSWORD: secret
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U dev -d myapp"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+
+volumes:
+    pgdata:
