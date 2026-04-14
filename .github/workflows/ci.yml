@@ -18,8 +18,19 @@ jobs:
 
             - name: Verify Containers Healthy
               run: |
-                  api_status=$(docker inspect devops-lab-api-1 --format='{{.State.Health.Status}}')
-                  db_status=$(docker inspect devops-lab-db-1 --format='{{.State.Health.Status}}')
+                  # Find containers by image name instead of fixed name
+                  api_container=$(docker ps -q --filter "ancestor=my-api")
+                  db_container=$(docker ps -q --filter "ancestor=postgres:15")
+
+                  if [[ -z "$api_container" || -z "$db_container" ]]; then
+                    echo "❌ Containers not found"
+                    docker ps
+                    exit 1
+                  fi
+
+                  api_status=$(docker inspect "$api_container" --format='{{.State.Health.Status}}')
+                  db_status=$(docker inspect "$db_container" --format='{{.State.Health.Status}}')
+
                   if [[ "$api_status" != "healthy" || "$db_status" != "healthy" ]]; then
                     echo "❌ Health check failed - API: $api_status, DB: $db_status"
                     exit 1
