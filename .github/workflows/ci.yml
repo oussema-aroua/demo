@@ -37,10 +37,11 @@ jobs:
                   fi
                   echo "✅ All services healthy"
 
-            - name: Set up Snyk
-              uses: snyk/actions/setup@master
-              with:
-                  version: latest
+            - name: Install Snyk CLI
+              run: npm install -g snyk
+
+            - name: Authenticate Snyk (public repos don't need token)
+              run: snyk auth
 
             - name: Scan Docker Image for Vulnerabilities
               run: |
